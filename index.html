@@ -1,0 +1,2869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SmartTendance - NSPM Staff App</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase Configuration for nspm-d4b5b -->
+    <script>
+        // Firebase Configuration for nspm-d4b5b
+        const firebaseConfig = {
+            apiKey: "AIzaSyCuZF7no0X_uaFnqWTtOIzBlHEMLDTFyv0",
+            authDomain: "nspm-d4b5b.firebaseapp.com",
+            databaseURL: "https://nspm-d4b5b-default-rtdb.firebaseio.com",
+            projectId: "nspm-d4b5b",
+            storageBucket: "nspm-d4b5b.firebasestorage.app",
+            messagingSenderId: "434056574953",
+            appId: "1:434056574953:web:82a6f5e35e409c361ebd78",
+            measurementId: "G-R2VGJXEZG1"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+        console.log("✅ Firebase initialized with nspm-d4b5b");
+    </script>
+    
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary: #44ff44;
+            --secondary: #3366cc;
+            --danger: #ff4444;
+            --warning: #ffaa00;
+            --success: #10b981;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #f5f5f5;
+            --card-bg: #1a1a1a;
+            --card-border: #333;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+        
+        body {
+            background: var(--dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        body.light-mode {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --dark: #f8fafc;
+            --darker: #e2e8f0;
+            --light: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Authentication Styles */
+        .auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        }
+        
+        body.light-mode .auth-container {
+            background: linear-gradient(135deg, #e0e0e0 0%, #f0f0f0 100%);
+        }
+        
+        .auth-box {
+            background: #2a2a2a;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        body.light-mode .auth-box {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .auth-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: #44ff44;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        
+        body.light-mode .auth-header {
+            background: linear-gradient(135deg, #e0e0e0 0%, #f0f0f0 100%);
+            color: #007bff;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .auth-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .auth-header p {
+            opacity: 0.9;
+            font-size: 14px;
+            color: #cccccc;
+        }
+        
+        body.light-mode .auth-header p {
+            color: #666666;
+        }
+        
+        .auth-body {
+            padding: 30px 25px;
+        }
+        
+        /* Staff Badge */
+        .staff-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 12px;
+            gap: 10px;
+            border: 1px solid #44ff44;
+        }
+        
+        body.light-mode .staff-badge {
+            background: #e0e0e0;
+            border: 1px solid #007bff;
+        }
+        
+        .staff-badge span {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        /* Form Toggle */
+        .form-toggle {
+            display: flex;
+            margin-bottom: 25px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 5px;
+        }
+        
+        body.light-mode .form-toggle {
+            background: #e0e0e0;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #cccccc;
+        }
+        
+        body.light-mode .toggle-btn {
+            color: #666666;
+        }
+        
+        .toggle-btn.active {
+            background: #44ff44;
+            color: #000000;
+        }
+        
+        body.light-mode .toggle-btn.active {
+            background: #007bff;
+            color: #ffffff;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #cccccc;
+        }
+        
+        body.light-mode .form-group label {
+            color: #666666;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon input, .input-with-icon select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            font-size: 16px;
+            background: #1a1a1a;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        
+        body.light-mode .input-with-icon input, 
+        body.light-mode .input-with-icon select {
+            border: 2px solid #ddd;
+            background: #f9f9f9;
+            color: #333333;
+        }
+        
+        .input-with-icon input:focus, .input-with-icon select:focus {
+            border-color: #44ff44;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(68, 255, 68, 0.2);
+        }
+        
+        body.light-mode .input-with-icon input:focus, 
+        body.light-mode .input-with-icon select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+        
+        .input-with-icon.error input {
+            border-color: #ff4444;
+        }
+        
+        .error-message {
+            color: #ff4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px;
+            background: #44ff44;
+            color: #000000;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        body.light-mode .btn {
+            background: #007bff;
+            color: #ffffff;
+        }
+        
+        .btn:hover {
+            background: #33dd33;
+            transform: translateY(-2px);
+        }
+        
+        body.light-mode .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            background: #666;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #cccccc;
+        }
+        
+        body.light-mode .terms {
+            color: #666666;
+        }
+        
+        .terms input {
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+        
+        .terms a {
+            color: #44ff44;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        body.light-mode .terms a {
+            color: #007bff;
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .forgot-password a {
+            color: #44ff44;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        body.light-mode .forgot-password a {
+            color: #007bff;
+        }
+        
+        /* Clear Cache Link - Hidden on auth screens */
+        .clear-cache-link {
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .clear-cache-link a {
+            color: #ffaa00;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        /* Main App Styles */
+        .app-container {
+            display: none;
+            max-width: 100%;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+        
+        /* Enhanced Header for Mobile */
+        .header {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--card-bg) 100%);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .header-content {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            font-size: 20px;
+            margin-bottom: 8px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .staff-info {
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            align-items: flex-start;
+        }
+        
+        .staff-info span {
+            display: block;
+            line-height: 1.3;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+        }
+        
+        body:not(.light-mode) .staff-info span {
+            color: #ffffff !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        body.light-mode .staff-info span {
+            color: #1a1a1a !important;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .theme-toggle, .new-session-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+        
+        .theme-toggle:hover, .new-session-toggle:hover {
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        /* Enhanced Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            padding: 8px 5px;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 5px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 10px;
+            min-height: 50px;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(68, 255, 68, 0.1);
+        }
+        
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-item .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 15px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Sessions Container */
+        .sessions-container {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            margin: 15px 0;
+        }
+        
+        .session-header {
+            background: var(--darker);
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .session-header h3 {
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        .sessions-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .sessions-table th {
+            background: var(--darker);
+            color: var(--primary);
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .sessions-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+        
+        .sessions-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .sessions-table tr:hover {
+            background: rgba(68, 255, 68, 0.05);
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: rgba(68, 255, 68, 0.2);
+            color: var(--primary);
+        }
+        
+        .status-completed {
+            background: rgba(100, 100, 100, 0.2);
+            color: var(--text-secondary);
+        }
+        
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 2px;
+        }
+        
+        .action-btn-primary {
+            background: var(--primary);
+            color: #000;
+        }
+        
+        .action-btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .action-btn-warning {
+            background: var(--warning);
+            color: #000;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Staff Number Input */
+        .staff-number-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            background: var(--darker);
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        /* Scanner Section */
+        .scanner-section {
+            text-align: center;
+        }
+        
+        .scanner-box {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+        
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            height: 280px;
+            margin: 0 auto 15px;
+            border: 3px solid var(--card-border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+            transition: all 0.3s ease;
+        }
+        
+        .camera-container.camera-active {
+            border-color: var(--primary);
+        }
+        
+        .camera-container.camera-dark {
+            border-color: var(--card-border);
+        }
+        
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .scan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            animation: scan 2s infinite;
+            box-shadow: 0 0 10px var(--primary);
+        }
+        
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
+        
+        .camera-dark-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            z-index: 5;
+            border-radius: 10px;
+        }
+        
+        .dark-camera-content {
+            max-width: 80%;
+        }
+        
+        .dark-camera-content i {
+            font-size: 48px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .dark-camera-content h3 {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+        
+        .dark-camera-content p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .scanner-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: #000;
+        }
+        
+        .btn-small {
+            padding: 10px 12px;
+            font-size: 13px;
+            width: auto;
+            margin: 2px;
+        }
+        
+        .camera-permission {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .camera-permission i {
+            font-size: 42px;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+        
+        .enable-camera-text {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 12px 0;
+            line-height: 1.2;
+            text-align: center;
+        }
+        
+        .enable-camera-text span {
+            display: block;
+            color: var(--text-primary);
+        }
+        
+        .camera-instruction {
+            font-size: 13px;
+            margin: 8px 0 15px;
+            color: var(--text-secondary);
+        }
+        
+        /* Settings Section */
+        .settings-section {
+            text-align: left;
+        }
+        
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .settings-group {
+            margin-bottom: 20px;
+        }
+        
+        .settings-group h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .logout-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--card-border);
+        }
+        
+        .logout-btn-settings {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .logout-btn-settings:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        
+        /* New Session Modal */
+        .new-session-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        
+        .new-session-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid var(--primary);
+            max-width: 400px;
+            width: 100%;
+            box-shadow: var(--shadow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .modal-buttons .btn {
+            flex: 1;
+            margin: 0;
+        }
+        
+        /* QR Modal */
+        .qr-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        
+        .qr-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid var(--primary);
+            max-width: 350px;
+            width: 100%;
+            box-shadow: var(--shadow);
+        }
+        
+        .qr-code-container {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: inline-block;
+        }
+        
+        .qr-code-image {
+            width: 200px;
+            height: 200px;
+            display: block;
+        }
+        
+        .qr-info {
+            margin: 15px 0;
+            text-align: left;
+            background: var(--darker);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .qr-info p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        
+        .qr-timer {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--warning);
+        }
+        
+        .live-scanning-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(68, 255, 68, 0.2);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        
+        .auto-scan-status {
+            background: var(--darker);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .scan-progress {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .scan-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #22cc22);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #333;
+            border-top: 5px solid #44ff44;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Result Modal */
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+        
+        .result-content {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid var(--primary);
+            max-width: 350px;
+            width: 100%;
+            box-shadow: var(--shadow);
+        }
+        
+        .result-success {
+            border-color: var(--success);
+        }
+        
+        .result-error {
+            border-color: var(--danger);
+        }
+        
+        .result-icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            background: var(--card-bg);
+            border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        }
+        
+        .notification-success {
+            border-left-color: var(--success);
+        }
+        
+        .notification-error {
+            border-left-color: var(--danger);
+        }
+        
+        .notification-warning {
+            border-left-color: var(--warning);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 18px; }
+            .camera-container { height: 250px; max-width: 100%; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .staff-number-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Section -->
+    <div id="authSection" class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1><i class="fas fa-id-card"></i> SmartTendance</h1>
+                <p>NSPM Staff Attendance Portal</p>
+            </div>
+            
+            <div class="auth-body">
+                <!-- Staff Badge -->
+                <div class="staff-badge">
+                    <i class="fas fa-id-badge"></i>
+                    <span>NSPM Staff Portal</span>
+                </div>
+                
+                <div class="form-toggle">
+                    <button class="toggle-btn active" id="loginToggle">Login</button>
+                    <button class="toggle-btn" id="signupToggle">Sign Up</button>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label for="loginId">Staff ID</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="loginId" placeholder="e.g., NSPM/STF/001" required>
+                        </div>
+                        <div class="error-message" id="loginIdError">Please enter a valid staff ID</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        </div>
+                        <div class="error-message" id="loginPasswordError">Please enter your password</div>
+                    </div>
+                    
+                    <div class="terms">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="loginButton">
+                        <i class="fas fa-sign-in-alt"></i> Login to NSPM Staff Portal
+                    </button>
+
+                    <div class="forgot-password">
+                        <a href="#" id="forgotPasswordLink">Forgot your password?</a>
+                    </div>
+                    
+                    <div class="clear-cache-link" id="clearCacheLinkContainer">
+                        <a href="#" id="clearCacheLink">Clear cache and reset login</a>
+                    </div>
+                </form>
+                
+                <!-- Signup Form -->
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="fullName" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="error-message" id="fullNameError">Please enter your full name</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-with-icon">
+                            <input type="email" id="email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="error-message" id="emailError">Please enter a valid email</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userId">NSPM Staff ID</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="userId" placeholder="e.g., NSPM/STF/001" required>
+                        </div>
+                        <div class="error-message" id="userIdError">Please enter a valid staff ID</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="institution">Department</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="institution" placeholder="Enter your department" required>
+                        </div>
+                        <div class="error-message" id="institutionError">Please enter your department</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="course">Location/Zone</label>
+                        <div class="input-with-icon">
+                            <input type="text" id="course" placeholder="Enter your location" required>
+                        </div>
+                        <div class="error-message" id="courseError">Please enter your location</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="signupPassword" placeholder="Create a strong password" required>
+                        </div>
+                        <div class="error-message" id="signupPasswordError">Password must be at least 8 characters</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                        </div>
+                        <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+                    </div>
+                    
+                    <div class="terms">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <label for="agreeTerms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a> of NSPM Plc</label>
+                    </div>
+                    <div class="error-message" id="termsError">You must agree to the terms and conditions</div>
+                    
+                    <button type="submit" class="btn" id="signupButton">
+                        <i class="fas fa-user-plus"></i> Create NSPM Staff Account
+                    </button>
+                </form>
+
+                <!-- Forgot Password Form -->
+                <form id="forgotPasswordForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="forgotEmail">Email Address</label>
+                        <div class="input-with-icon">
+                            <input type="email" id="forgotEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="error-message" id="forgotEmailError">Please enter a valid email</div>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="resetPasswordButton">
+                        <i class="fas fa-paper-plane"></i> Send Reset Instructions
+                    </button>
+
+                    <div class="forgot-password">
+                        <a href="#" id="backToLoginLink">Back to Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container" id="mainApp">
+        <!-- Enhanced Header for Mobile -->
+        <div class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-id-card"></i> SmartTendance</h1>
+                <div class="staff-info">
+                    <span id="staffName">John Doe</span>
+                    <span id="staffId">NSPM/STF/001</span>
+                    <span id="staffDept">Computer Science</span>
+                    <span id="staffLocation">Main Office</span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="new-session-toggle" onclick="showNewSessionModal()">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Clock In Tab -->
+        <div id="clockin" class="tab-content active">
+            <h2><i class="fas fa-clock"></i> Clock In Sessions</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-number" id="totalClockIns">0</div>
+                    <div class="stat-label">Total Clock Ins</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-play-circle"></i>
+                    <div class="stat-number" id="activeClockIns">0</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-number" id="completedClockIns">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-number" id="totalStaffClockIn">0</div>
+                    <div class="stat-label">Staff</div>
+                </div>
+            </div>
+            
+            <div class="sessions-container">
+                <div class="session-header">
+                    <h3><i class="fas fa-play-circle"></i> Active Clock In Sessions</h3>
+                    <button class="action-btn action-btn-primary" onclick="showNewSessionModal('clockin')">
+                        <i class="fas fa-plus"></i> New
+                    </button>
+                </div>
+                <table class="sessions-table" id="activeClockInTable">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Location</th>
+                            <th>Start Time</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeClockInBody">
+                        <!-- Active clock in sessions will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="sessions-container">
+                <div class="session-header">
+                    <h3><i class="fas fa-history"></i> Completed Clock In Sessions</h3>
+                </div>
+                <table class="sessions-table" id="completedClockInTable">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Location</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedClockInBody">
+                        <!-- Completed clock in sessions will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Clock Out Tab -->
+        <div id="clockout" class="tab-content">
+            <h2><i class="fas fa-door-open"></i> Clock Out Sessions</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-door-open"></i>
+                    <div class="stat-number" id="totalClockOuts">0</div>
+                    <div class="stat-label">Total Clock Outs</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-play-circle"></i>
+                    <div class="stat-number" id="activeClockOuts">0</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-number" id="completedClockOuts">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-number" id="totalStaffClockOut">0</div>
+                    <div class="stat-label">Staff</div>
+                </div>
+            </div>
+            
+            <div class="sessions-container">
+                <div class="session-header">
+                    <h3><i class="fas fa-play-circle"></i> Active Clock Out Sessions</h3>
+                    <button class="action-btn action-btn-primary" onclick="showNewSessionModal('clockout')">
+                        <i class="fas fa-plus"></i> New
+                    </button>
+                </div>
+                <table class="sessions-table" id="activeClockOutTable">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Location</th>
+                            <th>Start Time</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeClockOutBody">
+                        <!-- Active clock out sessions will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="sessions-container">
+                <div class="session-header">
+                    <h3><i class="fas fa-history"></i> Completed Clock Out Sessions</h3>
+                </div>
+                <table class="sessions-table" id="completedClockOutTable">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Location</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedClockOutBody">
+                        <!-- Completed clock out sessions will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Staff Scanner Tab -->
+        <div id="staffScanner" class="tab-content">
+            <div class="scanner-section">
+                <h2><i class="fas fa-qrcode"></i> Staff Scanner</h2>
+                <p style="color: var(--text-secondary); margin: 8px 0 12px;">Scan QR codes or enter staff number manually</p>
+                
+                <div class="sessions-container" style="margin-bottom: 15px;">
+                    <div class="session-header">
+                        <h3><i class="fas fa-keyboard"></i> Manual Entry</h3>
+                    </div>
+                    <div style="padding: 15px;">
+                        <div class="form-group">
+                            <label for="manualStaffNumber">Enter Staff Number</label>
+                            <input type="text" id="manualStaffNumber" class="staff-number-input" placeholder="e.g., NSPM/STF/001">
+                        </div>
+                        <div class="form-group">
+                            <label for="manualSessionType">Session Type</label>
+                            <select id="manualSessionType" style="width: 100%; padding: 12px; border-radius: 8px; background: var(--darker); color: var(--text-primary); border: 1px solid var(--card-border);">
+                                <option value="clockin">Clock In</option>
+                                <option value="clockout">Clock Out</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="processManualEntry()" style="margin-top: 10px;">
+                            <i class="fas fa-check"></i> Record Attendance
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="scanner-box">
+                    <div class="camera-container camera-dark">
+                        <div id="cameraDarkOverlay" class="camera-dark-overlay" style="display: flex;">
+                            <div class="dark-camera-content">
+                                <i class="fas fa-video-slash"></i>
+                                <h3>Camera Not Ready</h3>
+                                <p>Enable camera to start scanning QR codes</p>
+                            </div>
+                        </div>
+                        
+                        <video id="video" playsinline autoplay style="display: none;"></video>
+                        <div class="scan-overlay">
+                            <div class="scan-line"></div>
+                        </div>
+                        
+                        <div id="cameraPermission" class="camera-permission" style="display: none;">
+                            <i class="fas fa-camera"></i>
+                            <div class="enable-camera-text">
+                                <span>Enable</span>
+                                <span>Camera</span>
+                            </div>
+                            <p class="camera-instruction">Camera access is required to scan QR codes</p>
+                            <button class="btn" onclick="startScanner()" style="margin-top: 15px;">
+                                <i class="fas fa-camera"></i> Enable Camera
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="scanner-controls">
+                        <button class="btn" onclick="startScanner()" id="startBtn">
+                            <i class="fas fa-play"></i> Start Scanner
+                        </button>
+                        <button class="btn btn-danger" onclick="stopScanner()" id="stopBtn" style="display: none;">
+                            <i class="fas fa-stop"></i> Stop Scanner
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="color: var(--text-secondary); font-size: 11px; margin-top: 15px;">
+                    Hold steady for 2 seconds for best results
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="settings-section">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 13px;">Customize your app experience</p>
+                
+                <div class="settings-card">
+                    <div class="settings-group">
+                        <h3>Appearance</h3>
+                        <div class="setting-item">
+                            <span>Dark Mode</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="darkModeToggle" checked onchange="toggleDarkMode(this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <h3>Staff Information</h3>
+                        <div class="setting-item">
+                            <span>Department</span>
+                            <span id="settingsStaffDept">Computer Science</span>
+                        </div>
+                        <div class="setting-item">
+                            <span>Location</span>
+                            <span id="settingsStaffLocation">Main Office</span>
+                        </div>
+                    </div>
+                    
+                    <div class="logout-section">
+                        <button class="logout-btn-settings" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Bottom Navigation -->
+    <div class="bottom-nav" id="bottomNav" style="display: none;">
+        <button class="nav-item active" onclick="switchTab('clockin')">
+            <i class="fas fa-clock"></i>
+            <span class="nav-label">Clock In</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('clockout')">
+            <i class="fas fa-door-open"></i>
+            <span class="nav-label">Clock Out</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('staffScanner')">
+            <i class="fas fa-qrcode"></i>
+            <span class="nav-label">Scanner</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('settings')">
+            <i class="fas fa-cog"></i>
+            <span class="nav-label">Settings</span>
+        </button>
+    </div>
+
+    <!-- New Session Modal -->
+    <div class="new-session-modal" id="newSessionModal" style="display: none;">
+        <div class="new-session-content">
+            <h2 id="sessionModalTitle"><i class="fas fa-plus"></i> Start New Session</h2>
+            <p style="color: var(--text-secondary); margin: 8px 0 15px; font-size: 13px;" id="sessionModalDesc">Create a new clock in/out session</p>
+            
+            <div class="form-group">
+                <label for="sessionDepartment">Department</label>
+                <input type="text" id="sessionDepartment" placeholder="Enter department" value="Computer Science">
+            </div>
+            
+            <div class="form-group">
+                <label for="sessionLocation">Location/Zone</label>
+                <input type="text" id="sessionLocation" placeholder="Enter location" value="Main Office">
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeNewSessionModal()">Cancel</button>
+                <button class="btn" onclick="createNewSession()">Start Session</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div class="qr-modal" id="qrModal" style="display: none;">
+        <div class="qr-content">
+            <h3 id="qrModalTitle"><i class="fas fa-qrcode"></i> Clock In QR Code</h3>
+            
+            <div class="qr-code-container" id="qrCodeContainer">
+                <div style="text-align: center; color: #000; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Generating QR Code...</p>
+                </div>
+            </div>
+            
+            <div class="qr-timer" id="qrTimer">
+                <span>Valid for:</span> <span id="timerValue">10:00</span>
+            </div>
+
+            <div class="live-scanning-indicator">
+                <i class="fas fa-satellite-dish"></i> LIVE SCANNING
+            </div>
+
+            <div class="auto-scan-status">
+                <h4><i class="fas fa-robot"></i> Automatic Scanning Active</h4>
+                <p id="autoScanInfo">Waiting for staff scans...</p>
+                
+                <div class="scan-progress">
+                    <div class="scan-progress-bar" id="scanProgressBar"></div>
+                </div>
+                
+                <p id="scanStats"><span id="scannedCount">0</span> staff scanned</p>
+            </div>
+            
+            <div class="qr-info" id="qrInfo">
+                <!-- QR info will be populated here -->
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeQRModal()">Close</button>
+                <button class="btn" onclick="refreshQRCode()">Refresh QR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p id="loadingMessage">Processing...</p>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal" style="display: none;">
+        <div class="result-content" id="resultContent">
+            <div class="result-icon" id="resultIcon"></div>
+            <h3 id="resultTitle">Success</h3>
+            <p id="resultMessage" style="margin: 15px 0;"></p>
+            <button class="btn" onclick="closeResult()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // FIREBASE AUTH FUNCTIONS
+        // =============================================
+        
+        let currentUser = null;
+        let users = JSON.parse(localStorage.getItem('smartTendanceUsers')) || [];
+        
+        // Staff data
+        let clockInSessions = [];
+        let clockOutSessions = [];
+        let videoStream = null;
+        let scanInterval = null;
+        let isScannerActive = false;
+        let currentSessionId = null;
+        let qrTimerInterval = null;
+        
+        // DUPLICATE PROTECTION VARIABLES
+        let lastScannedCode = null;
+        let scanCooldown = false;
+
+        // =============================================
+        // FIREBASE AUTH FUNCTIONS
+        // =============================================
+        
+        async function handleFirebaseSignup(userData) {
+            try {
+                const cleanEmail = userData.userId.replace(/\//g, '.') + '@nspm.gov.ng';
+                const userCredential = await auth.createUserWithEmailAndPassword(cleanEmail, userData.password);
+                const firebaseUser = userCredential.user;
+                console.log("🔥 Firebase User Created:", firebaseUser.uid);
+                
+                await database.ref('users/' + firebaseUser.uid).set({
+                    ...userData,
+                    firebaseUid: firebaseUser.uid,
+                    cleanEmail: cleanEmail,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                });
+                
+                return firebaseUser;
+            } catch (error) {
+                console.error("Firebase Signup Error:", error);
+                throw error;
+            }
+        }
+
+        async function handleFirebaseLogin(staffId, password) {
+            try {
+                const cleanEmail = staffId.replace(/\//g, '.') + '@nspm.gov.ng';
+                const userCredential = await auth.signInWithEmailAndPassword(cleanEmail, password);
+                console.log("🔥 Firebase User Logged In:", userCredential.user.uid);
+                return userCredential.user;
+            } catch (error) {
+                console.error("Firebase Login Error:", error);
+                throw error;
+            }
+        }
+
+        function setupFirebaseAuthListener() {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log("🔥 Firebase Auth State: User is signed in", user.uid);
+                } else {
+                    console.log("🔥 Firebase Auth State: User is signed out");
+                }
+            });
+        }
+
+        // =============================================
+        // AUTH UI FUNCTIONS
+        // =============================================
+
+        function initApp() {
+            setupFirebaseAuthListener();
+            handlePasswordResetConfirmation();
+            
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        showMainApp();
+                    } else {
+                        currentUser = null;
+                        localStorage.removeItem('currentUser');
+                        showAuth();
+                        showResult('info', 'Session Expired', 'Your session has expired. Please login again.');
+                    }
+                });
+            } else {
+                showAuth();
+            }
+            
+            setupEventListeners();
+            
+            // Load saved sessions
+            loadSessions();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('loginToggle').addEventListener('click', showLoginForm);
+            document.getElementById('signupToggle').addEventListener('click', showSignupForm);
+            
+            document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showForgotPasswordForm();
+            });
+            
+            document.getElementById('backToLoginLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showLoginForm();
+            });
+            
+            document.getElementById('clearCacheLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                clearAuthCache();
+            });
+            
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleLogin();
+            });
+            
+            document.getElementById('signupForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleSignup();
+            });
+            
+            document.getElementById('forgotPasswordForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleForgotPassword();
+            });
+            
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        }
+
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('signupForm').classList.remove('active');
+            document.getElementById('forgotPasswordForm').classList.remove('active');
+            document.getElementById('loginToggle').classList.add('active');
+            document.getElementById('signupToggle').classList.remove('active');
+        }
+
+        function showSignupForm() {
+            document.getElementById('signupForm').classList.add('active');
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('forgotPasswordForm').classList.remove('active');
+            document.getElementById('signupToggle').classList.add('active');
+            document.getElementById('loginToggle').classList.remove('active');
+        }
+
+        function showForgotPasswordForm() {
+            document.getElementById('forgotPasswordForm').classList.add('active');
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('signupForm').classList.remove('active');
+            document.getElementById('loginToggle').classList.remove('active');
+            document.getElementById('signupToggle').classList.remove('active');
+        }
+
+        async function handleLogin() {
+            const staffId = document.getElementById('loginId').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!staffId || !password) {
+                showResult('error', 'Validation Error', 'Please enter both staff ID and password.');
+                return;
+            }
+            
+            showLoading('Signing in...');
+            
+            try {
+                const user = users.find(u => u.userId === staffId);
+                
+                if (!user) {
+                    hideLoading();
+                    showResult('error', 'Login Failed', 'Invalid staff ID or password.');
+                    return;
+                }
+                
+                await handleFirebaseLogin(staffId, password);
+                loginUser(user);
+                
+            } catch (error) {
+                hideLoading();
+                console.error("Login error:", error);
+                
+                if (error.code === 'auth/wrong-password') {
+                    showResult('error', 'Login Failed', 'The password is incorrect.');
+                } else if (error.code === 'auth/user-not-found') {
+                    showResult('error', 'Login Failed', 'No account found with these credentials.');
+                } else {
+                    showResult('error', 'Login Failed', 'An error occurred during login.');
+                }
+            }
+        }
+
+        async function handleSignup() {
+            const name = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const userId = document.getElementById('userId').value;
+            const department = document.getElementById('institution').value;
+            const location = document.getElementById('course').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            
+            if (!name || !email || !userId || !department || !location || !password || !confirmPassword) {
+                showResult('error', 'Validation Error', 'Please fill in all fields.');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showResult('error', 'Validation Error', 'Passwords do not match.');
+                return;
+            }
+            
+            if (!agreeTerms) {
+                showResult('error', 'Validation Error', 'You must agree to the terms.');
+                return;
+            }
+            
+            showLoading('Creating your NSPM staff account...');
+            
+            try {
+                const userData = {
+                    id: 'USER' + (users.length + 1001),
+                    name: name,
+                    email: email,
+                    password: password,
+                    userId: userId,
+                    department: department,
+                    location: location,
+                    role: 'staff'
+                };
+                
+                const firebaseUser = await handleFirebaseSignup(userData);
+                userData.firebaseUid = firebaseUser.uid;
+                
+                users.push(userData);
+                localStorage.setItem('smartTendanceUsers', JSON.stringify(users));
+                
+                loginUser(userData);
+                hideLoading();
+                
+                showResult('success', 'Account Created!', 'Your NSPM staff account has been created successfully.');
+                
+            } catch (error) {
+                hideLoading();
+                console.error("Registration Error:", error);
+                showResult('error', 'Registration Failed', 'Could not create account. Please try again.');
+            }
+        }
+
+        async function handleForgotPassword() {
+            const email = document.getElementById('forgotEmail').value;
+            
+            if (!email) {
+                showResult('error', 'Validation Error', 'Please enter your email address.');
+                return;
+            }
+            
+            showLoading('Sending reset instructions...');
+            
+            try {
+                await auth.sendPasswordResetEmail(email);
+                hideLoading();
+                showResult('success', 'Check Your Email', 'Password reset instructions have been sent.');
+                setTimeout(() => showLoginForm(), 3000);
+            } catch (error) {
+                hideLoading();
+                console.error("Password reset error:", error);
+                showResult('error', 'Password Reset Failed', 'Failed to send reset email. Please try again.');
+            }
+        }
+
+        function loginUser(user) {
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            hideLoading();
+            showMainApp();
+            initializeMainApp();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                stopScanner();
+                
+                auth.signOut().then(() => {
+                    console.log("User signed out from Firebase");
+                }).catch((error) => {
+                    console.error("Firebase sign out error:", error);
+                });
+                
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                showAuth();
+            }
+        }
+
+        function showAuth() {
+            document.getElementById('authSection').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('bottomNav').style.display = 'none';
+        }
+
+        function showMainApp() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('bottomNav').style.display = 'flex';
+            
+            if (currentUser) {
+                document.getElementById('staffName').textContent = currentUser.name;
+                document.getElementById('staffId').textContent = currentUser.userId;
+                document.getElementById('staffDept').textContent = currentUser.department;
+                document.getElementById('staffLocation').textContent = currentUser.location;
+                
+                document.getElementById('settingsStaffDept').textContent = currentUser.department;
+                document.getElementById('settingsStaffLocation').textContent = currentUser.location;
+            }
+        }
+
+        function showLoading(message = 'Processing...') {
+            document.getElementById('loadingMessage').textContent = message;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showResult(type, title, message) {
+            const modal = document.getElementById('resultModal');
+            const content = document.getElementById('resultContent');
+            const icon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            
+            content.className = `result-content ${type === 'success' ? 'result-success' : 'result-error'}`;
+            icon.innerHTML = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+            icon.style.color = type === 'success' ? 'var(--success)' : 'var(--danger)';
+            resultTitle.textContent = title;
+            resultMessage.innerHTML = message;
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeResult() {
+            document.getElementById('resultModal').style.display = 'none';
+        }
+
+        function showNotification(type, title, message) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <strong>${title}</strong><br>
+                <small>${message}</small>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function clearAuthCache() {
+            auth.signOut();
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('smartTendanceUsers');
+            sessionStorage.clear();
+            currentUser = null;
+            showResult('success', 'Cache Cleared', 'All cached data has been cleared. Please login again.');
+            showAuth();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLightMode = document.body.classList.contains('light-mode');
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.innerHTML = isLightMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', isLightMode);
+        }
+
+        function toggleDarkMode(enabled) {
+            document.body.classList.toggle('light-mode', !enabled);
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.innerHTML = !enabled ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+
+        function handlePasswordResetConfirmation() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            if (mode === 'resetPassword') {
+                showResult('success', 'Password Reset Confirmed', 'Please use your new password to login.');
+                showLoginForm();
+            }
+        }
+
+        // =============================================
+        // MAIN APPLICATION FUNCTIONS
+        // =============================================
+
+        function initializeMainApp() {
+            console.log("🚀 Initializing NSPM Staff App for user:", currentUser.name);
+            loadSessions();
+            updateStats();
+            console.log("✅ NSPM Staff App initialized for:", currentUser.name);
+        }
+
+        function loadSessions() {
+            const clockInKey = `clockInSessions_${currentUser.id}`;
+            const clockOutKey = `clockOutSessions_${currentUser.id}`;
+            
+            const savedClockIns = localStorage.getItem(clockInKey);
+            const savedClockOuts = localStorage.getItem(clockOutKey);
+            
+            if (savedClockIns) {
+                clockInSessions = JSON.parse(savedClockIns);
+            } else {
+                clockInSessions = [];
+                saveSessions();
+            }
+            
+            if (savedClockOuts) {
+                clockOutSessions = JSON.parse(savedClockOuts);
+            } else {
+                clockOutSessions = [];
+                saveSessions();
+            }
+            
+            renderSessions();
+            updateStats();
+        }
+
+        function saveSessions() {
+            const clockInKey = `clockInSessions_${currentUser.id}`;
+            const clockOutKey = `clockOutSessions_${currentUser.id}`;
+            
+            localStorage.setItem(clockInKey, JSON.stringify(clockInSessions));
+            localStorage.setItem(clockOutKey, JSON.stringify(clockOutSessions));
+        }
+
+        function updateStats() {
+            // Clock In stats
+            const activeClockIns = clockInSessions.filter(s => s.status === 'active').length;
+            const completedClockIns = clockInSessions.filter(s => s.status === 'completed').length;
+            const uniqueStaffClockIn = new Set(clockInSessions.map(s => s.staffId)).size;
+            
+            document.getElementById('totalClockIns').textContent = clockInSessions.length;
+            document.getElementById('activeClockIns').textContent = activeClockIns;
+            document.getElementById('completedClockIns').textContent = completedClockIns;
+            document.getElementById('totalStaffClockIn').textContent = uniqueStaffClockIn || 1;
+            
+            // Clock Out stats
+            const activeClockOuts = clockOutSessions.filter(s => s.status === 'active').length;
+            const completedClockOuts = clockOutSessions.filter(s => s.status === 'completed').length;
+            const uniqueStaffClockOut = new Set(clockOutSessions.map(s => s.staffId)).size;
+            
+            document.getElementById('totalClockOuts').textContent = clockOutSessions.length;
+            document.getElementById('activeClockOuts').textContent = activeClockOuts;
+            document.getElementById('completedClockOuts').textContent = completedClockOuts;
+            document.getElementById('totalStaffClockOut').textContent = uniqueStaffClockOut || 1;
+        }
+
+        function renderSessions() {
+            renderActiveClockIns();
+            renderCompletedClockIns();
+            renderActiveClockOuts();
+            renderCompletedClockOuts();
+        }
+
+        function renderActiveClockIns() {
+            const tbody = document.getElementById('activeClockInBody');
+            const activeSessions = clockInSessions.filter(s => s.status === 'active');
+            
+            if (activeSessions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No active clock in sessions</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            activeSessions.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            
+            activeSessions.forEach(session => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.department}</td>
+                    <td>${session.location}</td>
+                    <td>${formatTime(session.startTime)}</td>
+                    <td><span class="status-badge status-active">ACTIVE</span></td>
+                    <td>
+                        <button class="action-btn action-btn-primary" onclick="showQRModal('${session.id}', 'clockin')">
+                            <i class="fas fa-qrcode"></i> QR
+                        </button>
+                        <button class="action-btn action-btn-warning" onclick="completeSession('${session.id}', 'clockin')">
+                            <i class="fas fa-check"></i> Complete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderCompletedClockIns() {
+            const tbody = document.getElementById('completedClockInBody');
+            const completedSessions = clockInSessions.filter(s => s.status === 'completed');
+            
+            if (completedSessions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">No completed clock in sessions</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            completedSessions.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            
+            completedSessions.forEach(session => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.department}</td>
+                    <td>${session.location}</td>
+                    <td>${formatTime(session.startTime)}</td>
+                    <td>${session.endTime ? formatTime(session.endTime) : 'N/A'}</td>
+                    <td><span class="status-badge status-completed">COMPLETED</span></td>
+                    <td>
+                        <button class="action-btn action-btn-danger" onclick="deleteSession('${session.id}', 'clockin')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderActiveClockOuts() {
+            const tbody = document.getElementById('activeClockOutBody');
+            const activeSessions = clockOutSessions.filter(s => s.status === 'active');
+            
+            if (activeSessions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No active clock out sessions</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            activeSessions.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            
+            activeSessions.forEach(session => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.department}</td>
+                    <td>${session.location}</td>
+                    <td>${formatTime(session.startTime)}</td>
+                    <td><span class="status-badge status-active">ACTIVE</span></td>
+                    <td>
+                        <button class="action-btn action-btn-primary" onclick="showQRModal('${session.id}', 'clockout')">
+                            <i class="fas fa-qrcode"></i> QR
+                        </button>
+                        <button class="action-btn action-btn-warning" onclick="completeSession('${session.id}', 'clockout')">
+                            <i class="fas fa-check"></i> Complete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderCompletedClockOuts() {
+            const tbody = document.getElementById('completedClockOutBody');
+            const completedSessions = clockOutSessions.filter(s => s.status === 'completed');
+            
+            if (completedSessions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">No completed clock out sessions</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            completedSessions.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            
+            completedSessions.forEach(session => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.department}</td>
+                    <td>${session.location}</td>
+                    <td>${formatTime(session.startTime)}</td>
+                    <td>${session.endTime ? formatTime(session.endTime) : 'N/A'}</td>
+                    <td><span class="status-badge status-completed">COMPLETED</span></td>
+                    <td>
+                        <button class="action-btn action-btn-danger" onclick="deleteSession('${session.id}', 'clockout')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.nav-item[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            if (tabName === 'staffScanner') {
+                // Scanner tab selected
+            } else {
+                stopScanner();
+            }
+        }
+
+        let currentSessionType = 'clockin';
+
+        function showNewSessionModal(type = 'clockin') {
+            currentSessionType = type;
+            const modal = document.getElementById('newSessionModal');
+            const title = document.getElementById('sessionModalTitle');
+            const desc = document.getElementById('sessionModalDesc');
+            
+            if (type === 'clockin') {
+                title.innerHTML = '<i class="fas fa-clock"></i> Start Clock In Session';
+                desc.textContent = 'Create a new clock in session for staff';
+            } else {
+                title.innerHTML = '<i class="fas fa-door-open"></i> Start Clock Out Session';
+                desc.textContent = 'Create a new clock out session for staff';
+            }
+            
+            document.getElementById('sessionDepartment').value = currentUser?.department || '';
+            document.getElementById('sessionLocation').value = currentUser?.location || '';
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeNewSessionModal() {
+            document.getElementById('newSessionModal').style.display = 'none';
+        }
+
+        function createNewSession() {
+            const department = document.getElementById('sessionDepartment').value.trim();
+            const location = document.getElementById('sessionLocation').value.trim();
+            
+            if (!department || !location) {
+                showResult('error', 'Missing Information', 'Please fill in all fields.');
+                return;
+            }
+            
+            const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const newSession = {
+                id: sessionId,
+                staffId: currentUser.userId,
+                staffName: currentUser.name,
+                department: department,
+                location: location,
+                startTime: new Date().toISOString(),
+                endTime: null,
+                status: 'active',
+                scannedStaff: []
+            };
+            
+            if (currentSessionType === 'clockin') {
+                clockInSessions.push(newSession);
+            } else {
+                clockOutSessions.push(newSession);
+            }
+            
+            saveSessions();
+            renderSessions();
+            updateStats();
+            closeNewSessionModal();
+            
+            showResult('success', 'Session Started', 
+                `${currentSessionType === 'clockin' ? 'Clock In' : 'Clock Out'} session started at ${location}.`);
+        }
+
+        function completeSession(sessionId, type) {
+            const sessions = type === 'clockin' ? clockInSessions : clockOutSessions;
+            const session = sessions.find(s => s.id === sessionId);
+            
+            if (session && session.status === 'active') {
+                session.status = 'completed';
+                session.endTime = new Date().toISOString();
+                saveSessions();
+                renderSessions();
+                updateStats();
+                showNotification('success', 'Session Completed', 'Session has been completed.');
+                
+                closeQRModal();
+            }
+        }
+
+        function deleteSession(sessionId, type) {
+            if (confirm('Are you sure you want to delete this session?')) {
+                const sessions = type === 'clockin' ? clockInSessions : clockOutSessions;
+                const index = sessions.findIndex(s => s.id === sessionId);
+                
+                if (index !== -1) {
+                    sessions.splice(index, 1);
+                    saveSessions();
+                    renderSessions();
+                    updateStats();
+                    showNotification('success', 'Session Deleted', 'Session has been deleted.');
+                }
+            }
+        }
+
+        // =============================================
+        // MANUAL ENTRY FUNCTION
+        // =============================================
+
+        function processManualEntry() {
+            const staffNumber = document.getElementById('manualStaffNumber').value.trim();
+            const sessionType = document.getElementById('manualSessionType').value;
+            
+            if (!staffNumber) {
+                showResult('error', 'Missing Information', 'Please enter a staff number.');
+                return;
+            }
+            
+            const sessions = sessionType === 'clockin' ? clockInSessions : clockOutSessions;
+            const activeSessions = sessions.filter(s => s.status === 'active');
+            
+            if (activeSessions.length === 0) {
+                showResult('error', 'No Active Sessions', `There are no active ${sessionType === 'clockin' ? 'Clock In' : 'Clock Out'} sessions.`);
+                return;
+            }
+            
+            if (activeSessions.length === 1) {
+                const session = activeSessions[0];
+                
+                if (!session.scannedStaff) {
+                    session.scannedStaff = [];
+                }
+                
+                if (session.scannedStaff.includes(staffNumber)) {
+                    showResult('warning', 'Already Recorded', 'This staff number has already been recorded for this session.');
+                    return;
+                }
+                
+                session.scannedStaff.push(staffNumber);
+                
+                const scanRef = database.ref(`scans/${session.id}/${staffNumber.replace(/\//g, '_')}`);
+                scanRef.set({
+                    staffId: staffNumber,
+                    staffName: currentUser.name,
+                    timestamp: Date.now(),
+                    department: session.department,
+                    location: session.location,
+                    type: sessionType
+                }).then(() => {
+                    saveSessions();
+                    
+                    document.getElementById('manualStaffNumber').value = '';
+                    
+                    showResult('success', 'Attendance Recorded!', 
+                        `Staff ${staffNumber} has been successfully recorded for ${sessionType === 'clockin' ? 'Clock In' : 'Clock Out'} in ${session.department}.`);
+                }).catch(error => {
+                    console.error('Error saving to Firebase:', error);
+                    showResult('error', 'Error', 'Failed to record attendance. Please try again.');
+                });
+            } else {
+                showResult('error', 'Multiple Active Sessions', 
+                    `There are ${activeSessions.length} active ${sessionType === 'clockin' ? 'Clock In' : 'Clock Out'} sessions. Please complete the session you want to use.`);
+            }
+        }
+
+        // =============================================
+        // QR CODE FUNCTIONS
+        // =============================================
+
+        function showQRModal(sessionId, type) {
+            const sessions = type === 'clockin' ? clockInSessions : clockOutSessions;
+            const session = sessions.find(s => s.id === sessionId);
+            
+            if (!session) return;
+            
+            currentSessionId = sessionId;
+            
+            const modal = document.getElementById('qrModal');
+            const title = document.getElementById('qrModalTitle');
+            const qrInfo = document.getElementById('qrInfo');
+            
+            title.innerHTML = type === 'clockin' ? 
+                '<i class="fas fa-clock"></i> Clock In QR Code' : 
+                '<i class="fas fa-door-open"></i> Clock Out QR Code';
+            
+            qrInfo.innerHTML = `
+                <p><strong>Department:</strong> ${session.department}</p>
+                <p><strong>Location:</strong> ${session.location}</p>
+                <p><strong>Start Time:</strong> ${formatTime(session.startTime)}</p>
+                <p><strong>Session ID:</strong> ${session.id}</p>
+            `;
+            
+            generateQRCode(session, type);
+            startQRTimer(10);
+            updateScanStatus(sessionId, type);
+            
+            modal.style.display = 'flex';
+        }
+
+        function generateQRCode(session, type) {
+            const qrData = {
+                sessionId: session.id,
+                type: type,
+                department: session.department,
+                location: session.location,
+                staffId: session.staffId,
+                staffName: session.staffName,
+                timestamp: Date.now()
+            };
+            
+            const container = document.getElementById('qrCodeContainer');
+            container.innerHTML = '<div><i class="fas fa-spinner fa-spin"></i><br>Generating...</div>';
+            
+            try {
+                const encoded = encodeURIComponent(JSON.stringify(qrData));
+                const img = document.createElement('img');
+                img.className = 'qr-code-image';
+                img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encoded}`;
+                img.alt = 'QR Code';
+                img.onload = () => {
+                    container.innerHTML = '';
+                    container.appendChild(img);
+                };
+                container.appendChild(img);
+            } catch (e) {
+                container.innerHTML = '<div>Error generating QR</div>';
+            }
+        }
+
+        function startQRTimer(minutes) {
+            let timeLeft = minutes * 60;
+            if (qrTimerInterval) clearInterval(qrTimerInterval);
+            
+            const update = () => {
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                document.getElementById('timerValue').textContent = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(qrTimerInterval);
+                    closeQRModal();
+                    showNotification('warning', 'QR Expired', 'The QR code has expired.');
+                }
+                timeLeft--;
+            };
+            
+            update();
+            qrTimerInterval = setInterval(update, 1000);
+        }
+
+        function updateScanStatus(sessionId, type) {
+            const sessions = type === 'clockin' ? clockInSessions : clockOutSessions;
+            const session = sessions.find(s => s.id === sessionId);
+            
+            if (session) {
+                const scannedCount = session.scannedStaff ? session.scannedStaff.length : 0;
+                document.getElementById('scannedCount').textContent = scannedCount;
+                
+                const progress = Math.min(scannedCount * 10, 100);
+                document.getElementById('scanProgressBar').style.width = progress + '%';
+                
+                if (scannedCount > 0) {
+                    document.getElementById('autoScanInfo').innerHTML = 
+                        `<i class="fas fa-check-circle"></i> ${scannedCount} staff scanned`;
+                }
+            }
+        }
+
+        function refreshQRCode() {
+            if (currentSessionId) {
+                const clockInSession = clockInSessions.find(s => s.id === currentSessionId);
+                const type = clockInSession ? 'clockin' : 'clockout';
+                const session = clockInSession || clockOutSessions.find(s => s.id === currentSessionId);
+                
+                if (session) {
+                    generateQRCode(session, type);
+                    startQRTimer(10);
+                }
+            }
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').style.display = 'none';
+            if (qrTimerInterval) clearInterval(qrTimerInterval);
+            currentSessionId = null;
+        }
+
+        // =============================================
+        // SCANNER FUNCTIONS - INSTANT ATTENDANCE RECORDING
+        // =============================================
+
+        async function startScanner() {
+            if (isScannerActive) return;
+            
+            const video = document.getElementById('video');
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const cameraPermission = document.getElementById('cameraPermission');
+            const cameraDarkOverlay = document.getElementById('cameraDarkOverlay');
+            
+            try {
+                const constraints = { 
+                    video: { 
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                };
+                
+                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = videoStream;
+                
+                video.onloadedmetadata = function() {
+                    cameraPermission.style.display = 'none';
+                    cameraDarkOverlay.style.display = 'none';
+                    video.style.display = 'block';
+                    
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'block';
+                    
+                    scanInterval = setInterval(scanQRCode, 500);
+                    isScannerActive = true;
+                    
+                    const cameraContainer = document.querySelector('.camera-container');
+                    cameraContainer.classList.remove('camera-dark');
+                    cameraContainer.classList.add('camera-active');
+                    
+                    console.log("✅ Camera started successfully");
+                };
+                
+            } catch (err) {
+                console.error('Camera access error:', err);
+                cameraPermission.style.display = 'flex';
+                cameraDarkOverlay.style.display = 'none';
+                video.style.display = 'none';
+                
+                showResult('error', 'Camera Error', 'Unable to access camera. Please check permissions.');
+            }
+        }
+
+        function stopScanner() {
+            if (!isScannerActive) return;
+            
+            const video = document.getElementById('video');
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const cameraDarkOverlay = document.getElementById('cameraDarkOverlay');
+            
+            scanCooldown = false;
+            lastScannedCode = null;
+            
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                videoStream = null;
+            }
+            
+            if (scanInterval) {
+                clearInterval(scanInterval);
+                scanInterval = null;
+            }
+            
+            cameraDarkOverlay.style.display = 'flex';
+            video.style.display = 'none';
+            startBtn.style.display = 'block';
+            stopBtn.style.display = 'none';
+            
+            isScannerActive = false;
+            
+            const cameraContainer = document.querySelector('.camera-container');
+            cameraContainer.classList.add('camera-dark');
+            cameraContainer.classList.remove('camera-active');
+            
+            console.log("🛑 Scanner stopped completely");
+        }
+
+        function scanQRCode() {
+            const video = document.getElementById('video');
+            
+            if (!video || video.readyState !== video.HAVE_ENOUGH_DATA || !isScannerActive || scanCooldown) {
+                return;
+            }
+            
+            try {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code && code.data !== lastScannedCode) {
+                    console.log("✅ QR Code detected - PROCESSING:", code.data);
+                    
+                    scanCooldown = true;
+                    lastScannedCode = code.data;
+                    
+                    processQRCode(code.data);
+                    
+                    setTimeout(() => {
+                        scanCooldown = false;
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error("❌ QR scanning error:", err);
+            }
+        }
+
+        // =============================================
+        // FIXED processQRCode FUNCTION - INSTANT ATTENDANCE RECORDING
+        // =============================================
+        
+        async function processQRCode(qrData) {
+            try {
+                console.log("🔄 Processing QR code:", qrData);
+                
+                let data;
+                try {
+                    data = JSON.parse(qrData);
+                } catch (parseError) {
+                    throw new Error('Invalid QR code format');
+                }
+
+                if (!data.sessionId || !data.type) {
+                    throw new Error('Invalid QR code: Missing required fields');
+                }
+
+                showLoading('Recording attendance...');
+
+                const staffId = currentUser.userId;
+                const staffScanKey = staffId.replace(/\//g, '_');
+                
+                // Check Firebase for existing scan
+                const scanRef = database.ref(`scans/${data.sessionId}/${staffScanKey}`);
+                const snapshot = await scanRef.once('value');
+                
+                if (snapshot.exists()) {
+                    hideLoading();
+                    throw new Error('You have already scanned for this session');
+                }
+
+                // Save to Firebase FIRST (instant recording)
+                await scanRef.set({
+                    staffId: staffId,
+                    staffName: currentUser.name,
+                    timestamp: Date.now(),
+                    department: currentUser.department || data.department,
+                    location: currentUser.location || data.location,
+                    type: data.type
+                });
+
+                console.log("✅ Scan saved to Firebase - ATTENDANCE RECORDED INSTANTLY");
+
+                // Update local sessions for UI
+                let sessions = data.type === 'clockin' ? clockInSessions : clockOutSessions;
+                let session = sessions.find(s => s.id === data.sessionId);
+                
+                if (!session) {
+                    session = {
+                        id: data.sessionId,
+                        staffId: data.staffId || staffId,
+                        staffName: data.staffName || currentUser.name,
+                        department: data.department || currentUser.department,
+                        location: data.location || currentUser.location,
+                        startTime: new Date().toISOString(),
+                        endTime: null,
+                        status: 'active',
+                        scannedStaff: [staffId]
+                    };
+                    
+                    if (data.type === 'clockin') {
+                        clockInSessions.push(session);
+                    } else {
+                        clockOutSessions.push(session);
+                    }
+                    
+                    saveSessions();
+                    console.log("✅ Session created from QR data for UI");
+                } else {
+                    if (!session.scannedStaff) {
+                        session.scannedStaff = [];
+                    }
+                    if (!session.scannedStaff.includes(staffId)) {
+                        session.scannedStaff.push(staffId);
+                        saveSessions();
+                    }
+                }
+
+                renderSessions();
+                updateStats();
+                
+                updateScanStatus(data.sessionId, data.type);
+                
+                hideLoading();
+                
+                showResult('success', '✅ ATTENDANCE RECORDED!', 
+                    `You have successfully ${data.type === 'clockin' ? 'CLOCKED IN' : 'CLOCKED OUT'} at ${data.location || currentUser.location}<br>
+                     Department: ${data.department || currentUser.department}<br>
+                     Time: ${new Date().toLocaleTimeString()}<br>
+                     <strong>Your attendance is now recorded in the system.</strong>`);
+                
+                setTimeout(() => {
+                    stopScanner();
+                }, 2000);
+                   
+            } catch (error) {
+                console.error("❌ QR processing error:", error);
+                hideLoading();
+                scanCooldown = false;
+                lastScannedCode = null;
+                showResult('error', 'Scan Failed', error.message);
+            }
+        }
+
+        // =============================================
+        // UTILITY FUNCTIONS
+        // =============================================
+
+        function formatTime(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true
+                });
+            } catch (error) {
+                return 'Invalid Time';
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            initApp();
+            
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+                document.getElementById('darkModeToggle').checked = false;
+            }
+        });
+    </script>
+</body>
+</html>
